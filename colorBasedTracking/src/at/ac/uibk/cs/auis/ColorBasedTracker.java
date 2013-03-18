@@ -120,6 +120,9 @@ public class ColorBasedTracker {
 		return dilatedMask;
 	}
 
+	/**
+	 * @return the surrounding of the rectangle
+	 */
 	public Rect getBoundingRect() {
 		return boundingRect;
 	}
