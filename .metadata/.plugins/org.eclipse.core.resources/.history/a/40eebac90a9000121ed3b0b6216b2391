@@ -28,9 +28,6 @@ public class ColorBasedTracker {
 	private Rect boundingRect;
 	private static double MINIMAL_VALUE_OF_CONTOUR_ARE = 0.1;
 	
-	/**
-	 * initializes the bounds used for range checking in HSV-color-space
-	 */
 	private void initializeBounds() {
 		lowerBound = new Scalar(0);
 		upperBound = new Scalar(0);
