@@ -44,6 +44,13 @@ public class ColorBasedTracker {
 		upperBound.val[3] = 255;
 	}
 
+	/**
+	 * calculates the center of mass using <code>colorForTrackingHSV</code> and <code>colorRadius</code> as radius (in HSV-color space)
+	 * @param hsv
+	 *  the frame of which the center of mass should be calculated off
+	 * @return
+	 *  the center of mass as a point in pixel coordinates (i.e. integer)
+	 */
 	public Point calcCenterOfMass(Mat hsv) {
 		blackWhiteMask = new Mat();
 		Core.inRange(hsv, lowerBound, upperBound, blackWhiteMask);
