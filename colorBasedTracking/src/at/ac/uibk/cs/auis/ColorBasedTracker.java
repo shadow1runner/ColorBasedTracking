@@ -44,6 +44,7 @@ public class ColorBasedTracker {
 		upperBound.val[3] = 255;
 	}
 
+	
 	/**
 	 * calculates the center of mass using <code>colorForTrackingHSV</code> and <code>colorRadius</code> as radius (in HSV-color space)
 	 * @param hsv
