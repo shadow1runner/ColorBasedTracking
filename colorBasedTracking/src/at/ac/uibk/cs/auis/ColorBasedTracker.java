@@ -44,6 +44,11 @@ public class ColorBasedTracker {
 		upperBound.val[3] = 255;
 	}
 
+	
+	/**
+	 * @param hsv image in hsv color space
+	 * @return the center of mass of the selected color
+	 */
 	public Point calcCenterOfMass(Mat hsv) {
 		blackWhiteMask = new Mat();
 		Core.inRange(hsv, lowerBound, upperBound, blackWhiteMask);
