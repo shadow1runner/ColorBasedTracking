@@ -26,7 +26,7 @@ public class ColorBasedTracker {
 
 	private List<MatOfPoint> contour;
 	private Rect boundingRect;
-	private static double MINIMAL_VALUE_OF_CONTOUR_ARE = 0.1;
+	private List<Point> trackPath = new ArrayList<Point>();
 	
 	/**
 	 * initializes the bounds used for range checking in HSV-color-space
@@ -70,7 +70,9 @@ public class ColorBasedTracker {
 		int centerOfMassX = boundingRect.x + boundingRect.width / 2;
 		int centerOfMassY = boundingRect.y + boundingRect.height / 2;
 
-		return new Point(centerOfMassX, centerOfMassY);
+		Point centerOfMass = new Point(centerOfMassX, centerOfMassY);
+		trackPath.add(centerOfMass);
+		return centerOfMass;
 	}
 
 	private MatOfPoint findLargenstContour(List<MatOfPoint> contours) {
@@ -89,9 +91,10 @@ public class ColorBasedTracker {
 			}
 		}
 
-		if (maxArea < MINIMAL_VALUE_OF_CONTOUR_AREA)
+		if (maxArea < MINIMAL_VALUE_OF_CONTOUR_AREA){
+			boundingRect = null;
 			throw new IllegalArgumentException();
-
+		}
 		return maxAreaMatrix;
 	}
 
@@ -126,7 +129,15 @@ public class ColorBasedTracker {
 	public Rect getBoundingRect() {
 		return boundingRect;
 	}
-	
-	
 
+
+	public List<MatOfPoint> getContour() {
+		return contour;
+	}
+
+
+	public List<Point> getTrackPath() {
+		return trackPath;
+	}
+	
 }

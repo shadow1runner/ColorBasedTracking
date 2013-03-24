@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: D:\\Skydrive\\Studium\\Einführung in autonome und intelligente Systeme\\PS\\2.)ColorBasedTracking\\OpenCV Library - 2.4.4\\src\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
+ * Original file: D:\\Studium\\4.Semester\\EinfuhrungInAutonomeIntelligenteSysteme\\PS\\ColorBasedTracking\\OpenCV Library - 2.4.4\\src\\org\\opencv\\engine\\OpenCVEngineInterface.aidl
  */
 package org.opencv.engine;
 /**
