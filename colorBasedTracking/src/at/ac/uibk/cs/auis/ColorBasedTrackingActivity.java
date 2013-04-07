@@ -54,16 +54,13 @@ public class ColorBasedTrackingActivity extends Activity implements
 	private ActivityMode selectedMenu = ActivityMode.CenterOfMassRgbMode;
 
 	private enum ActivityMode {
-//		TrackColorMode, // indicates that the user is currently choosing a color
-//						// (which later on should be used for tracking the ROI)
-		CenterOfMassRgbMode, // the center of mass is displayed in a rgb-frame
-		BlackWhiteMode, // the inRange-function is displayed
-		DilateMode, // the dilated black-White-Frame is displayed
-		BoundingRectangleMode, // displays the bounding rectangle in rgb-frame
-		CenterOfMassModeBlackWhiteMode, // the center of mass is displayed in a
-										// black-white-frame
-		ContoursMode, // the contours are displayed
-		TrackingPathMode,
+		CenterOfMassRgbMode, 			// the center of mass is displayed in a rgb-frame
+		BlackWhiteMode, 				// the inRange-function is displayed
+		DilateMode, 					// the dilated black-White-Frame is displayed
+		BoundingRectangleMode, 			// displays the bounding rectangle in rgb-frame
+		CenterOfMassModeBlackWhiteMode, // the center of mass is displayed in a black-white-frame
+		ContoursMode, 					// the contours are displayed
+		TrackingPathMode,				// shows the path the center of mass takes while capturing frames (and the smartphone is moved)
 	}
 
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -100,7 +97,6 @@ public class ColorBasedTrackingActivity extends Activity implements
 				mOpenCvCameraView.setClickable(false);
 			}
 		});
-
 	}
 
 	@Override
@@ -150,8 +146,7 @@ public class ColorBasedTrackingActivity extends Activity implements
 		Mat rgba = inputFrame.rgba();
 
 		if (isTracking == false)
-			return createRectangle(rgba, PIXELS_OF_PREVIEW, PIXELS_OF_PREVIEW,
-					THICKNESS_OF_RECTANGLE);
+			return createRectangle(rgba, PIXELS_OF_PREVIEW, PIXELS_OF_PREVIEW, THICKNESS_OF_RECTANGLE);
 
 		else {
 			Mat hsv = new Mat();
@@ -159,18 +154,16 @@ public class ColorBasedTrackingActivity extends Activity implements
 
 			if (trackColor == true) {
 				trackColor = false;
-				Point center = new Point(hsv.width() / 2, hsv.height() / 2);
-				colorBasedTracker.setColorForTrackingHSV(trackerHelper
-						.calcColorForTracking(hsv, center));
+				Point center = new Point(hsv.width()/2, hsv.height()/2);
+				colorBasedTracker.setColorForTrackingHSV(trackerHelper.calcColorForTracking(hsv, center));
 			}
 
 			Point centerOfMass = null;
 			
 			try {
 				centerOfMass = colorBasedTracker.calcCenterOfMass(hsv);
-			} catch (IllegalArgumentException e) {
-			}
-			;
+			} catch (IllegalArgumentException e) {}
+			
 			switch (selectedMenu) {
 			case BlackWhiteMode:
 				rgba = colorBasedTracker.getBlackWhiteMask();
@@ -178,14 +171,12 @@ public class ColorBasedTrackingActivity extends Activity implements
 
 			case BoundingRectangleMode:
 				if (colorBasedTracker.getBoundingRect() != null)
-					rgba = createRectangle(rgba,
-							colorBasedTracker.getBoundingRect());
+					rgba = createRectangle(rgba, colorBasedTracker.getBoundingRect());
 				break;
 
 			case CenterOfMassModeBlackWhiteMode:
 				Mat rgbaBwMask = new Mat();
-				Imgproc.cvtColor(colorBasedTracker.getDilatedMask(),
-							rgbaBwMask, Imgproc.COLOR_GRAY2BGRA);
+				Imgproc.cvtColor(colorBasedTracker.getDilatedMask(), rgbaBwMask, Imgproc.COLOR_GRAY2BGRA);
 				if(colorBasedTracker.getBoundingRect() != null)
 					rgba = drawCenterOfMass(rgbaBwMask, centerOfMass);
 				break;
@@ -208,33 +199,46 @@ public class ColorBasedTrackingActivity extends Activity implements
 			case TrackingPathMode:
 				rgba = drawTrackPath(rgba, colorBasedTracker.getTrackPath());
 				break;
-
 			}
 
 			return rgba;
 		}
 	}
 
-	private Mat createRectangle(Mat picture, int heigth, int width,
-			int borderSize) {
+	/**
+	 * creates a rectangle at the center of {@code picture} and returns it
+	 * @param picture
+	 * 	the picture to create the rectangle in
+	 * @param heigth
+	 *  the height of the rectangle to be created
+	 * @param width
+	 * 	the width of the rectangle to be created
+	 * @param borderSize
+	 *  the border-width of the rectangle
+	 * @return
+	 *  {@code picture} with a rectangle
+	 */
+	private Mat createRectangle(Mat picture, int heigth, int width, int borderSize) {
 		int OffsetXofRect = picture.width() / 2 - width / 2 - borderSize;
 		int OffsetYofRect = picture.height() / 2 - heigth / 2 - borderSize;
 
-		Point topLeft = new Point(OffsetXofRect - THICKNESS_OF_RECTANGLE,
-				OffsetYofRect - THICKNESS_OF_RECTANGLE);
-		Point bottomRight = new Point(OffsetXofRect + width
-				+ THICKNESS_OF_RECTANGLE, OffsetYofRect + heigth
-				+ THICKNESS_OF_RECTANGLE);
-		Core.rectangle(picture, topLeft, bottomRight, INDICATING_COLOR,
-				THICKNESS_OF_RECTANGLE);
+		Point topLeft = new Point(OffsetXofRect - THICKNESS_OF_RECTANGLE, OffsetYofRect - THICKNESS_OF_RECTANGLE);
+		Point bottomRight = new Point(OffsetXofRect + width + THICKNESS_OF_RECTANGLE, OffsetYofRect + heigth + THICKNESS_OF_RECTANGLE);
+		Core.rectangle(picture, topLeft, bottomRight, INDICATING_COLOR, THICKNESS_OF_RECTANGLE);
 		return picture;
 	}
 
+	/**
+	 * draws the specified dimensions of the rectangle {@code rec} into matrix {@code picture}
+	 */
 	private Mat createRectangle(Mat picture, Rect rec) {
 		Core.rectangle(picture, rec.tl(), rec.br(), INDICATING_COLOR);
 		return picture;
 	}
 
+	/**
+	 * draws the center of mass specified by the point {@code centerOfMass} and returns the resulting mat
+	 */
 	private Mat drawCenterOfMass(Mat picture, Point centerOfMass) {
 		
 		int centerMaxX = (int) (centerOfMass.x + SIZE_OF_CENTER_OF_MASS / 2);
@@ -268,9 +272,13 @@ public class ColorBasedTrackingActivity extends Activity implements
 		return picture;
 	}
 
+	/**
+	 * draws the list of points specified by {@code path} into {@code rgba}
+	 */
 	private Mat drawTrackPath(Mat rgba, List<Point> path){
-		for(int i = 0; i<path.size() - 1; i++)
-		Core.line(rgba, path.get(i), path.get(i+1), INDICATING_COLOR);
+		for(int i = 0; i<path.size()-1; i++)
+			Core.line(rgba, path.get(i), path.get(i+1), INDICATING_COLOR);
+		
 		return rgba;
 	}
 	
@@ -280,5 +288,4 @@ public class ColorBasedTrackingActivity extends Activity implements
 		startActivity(new Intent(this, ColorBasedTrackingActivity.class));
 		finish();
 	}
-
 }

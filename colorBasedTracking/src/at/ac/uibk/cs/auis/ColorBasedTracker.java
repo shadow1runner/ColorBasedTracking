@@ -62,10 +62,9 @@ public class ColorBasedTracker {
 		contour = new ArrayList<MatOfPoint>();
 		Mat mHierarchy = new Mat();
 		Mat tempDilatedMask = dilatedMask.clone();
-		Imgproc.findContours(tempDilatedMask, contour, mHierarchy,
-				Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+		Imgproc.findContours(tempDilatedMask, contour, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-		boundingRect = Imgproc.boundingRect(findLargenstContour(contour));
+		boundingRect = Imgproc.boundingRect(findLargestContour(contour));
 
 		int centerOfMassX = boundingRect.x + boundingRect.width / 2;
 		int centerOfMassY = boundingRect.y + boundingRect.height / 2;
@@ -75,7 +74,11 @@ public class ColorBasedTracker {
 		return centerOfMass;
 	}
 
-	private MatOfPoint findLargenstContour(List<MatOfPoint> contours) {
+	/**
+	 * finds the largest contour ot of a List of countours {@code contours}
+	 * throws IllegalArgumentException if the maximum contour specifing the minimum area {@code MINIMAL_VALUE_OF_CONTOUR_AREA} is not met
+	 */
+	private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
 		// Find max contour area
 		MatOfPoint maxAreaMatrix = new MatOfPoint();
 
@@ -123,21 +126,15 @@ public class ColorBasedTracker {
 		return dilatedMask;
 	}
 
-	/**
-	 * @return the surrounding of the rectangle
-	 */
 	public Rect getBoundingRect() {
 		return boundingRect;
 	}
-
 
 	public List<MatOfPoint> getContour() {
 		return contour;
 	}
 
-
 	public List<Point> getTrackPath() {
 		return trackPath;
-	}
-	
+	}	
 }
